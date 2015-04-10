@@ -1,0 +1,85 @@
+<link href="../polymer/polymer.html" rel="import">
+<link href="../core-dropdown/core-dropdown.html" rel="import">
+<link href="../paper-shadow/paper-shadow.html" rel="import">
+
+<link href="../paper-dropdown/paper-dropdown-transition.html" rel="import">
+
+<style shim-shadowdom>
+  html /deep/ cg-dropdown {
+    position: absolute;
+    overflow: visible;
+    min-height: 40px;
+  }
+</style>
+
+<polymer-element name="cg-dropdown" extends="core-dropdown">
+<template>
+
+  <style>
+    #ripple {
+      background-color: #fff;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.26);
+      opacity: 0;
+    }
+
+    :host([halign=right]) #ripple {
+      left: auto;
+      right: 0;
+    }
+
+    :host([valign=bottom]) #ripple {
+      top: auto;
+      bottom: 0;
+    }
+
+    #background {
+      background-color: #fff;
+      border-radius: inherit;
+    }
+
+    #scroller {
+      overflow: auto;
+      box-sizing: border-box;
+    }
+
+    #header {
+      margin: 5px!important;
+    }
+  </style>
+
+  <div id="ripple"></div>
+
+  <div id="background" fit>
+    <paper-shadow fit></paper-shadow>
+  </div>
+  <div id="header">
+      <content select="[role='header']"></content>
+  </div>
+  <div id="scroller" relative>
+    <content select="*:not([role='header'])"></content>
+  </div>
+
+</template>
+<script>
+
+  Polymer({
+
+    publish: {
+      transition: 'cg-dropdown-transition'
+    },
+
+    ready: function() {
+      this.super();
+      this.sizingTarget = this.$.scroller;
+    }
+
+  });
+
+</script>
+</polymer-element>

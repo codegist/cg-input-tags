@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>cg-datetime-input Demo</title>
+    <link rel="import" href="../paper-input/paper-input-decorator.html">
+    <link rel="import" href="cg-input-tags.html">
+    <style>
+        .demo {
+            margin-boottom:60px;
+            min-height: 300px;
+        }
+        .demo-item {
+            padding: 2px;
+            min-height: 300px;
+        }
+    </style>
+</head>
+
+
+<body unresolved fullbleed layout vertical center center-justified>
+
+<template id="sandbox" is="auto-binding">
+    <section layout vertical left>
+        <h2>tag input demo</h2>
+        <section>
+            <p>Selected: <span id="selected"></span></p>
+            <p>total tags: <span id="tags"></span></p>
+            <cg-input-tags required tags="{{tags}}" selected="{{selected}}" label="Tags" on-change="{{change}}"></cg-input-tags>
+        </section>
+        <h2>input select form demo</h2>
+        <section>
+            <div horizontal layout wrap class="party-info-form">
+                <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
+                    <cg-input-tags required tags="{{tags}}" selected="{{selected}}" on-change="{{change}}"></cg-input-tags>
+                </paper-input-decorator>
+                <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
+                    <input required is="core-input">
+                </paper-input-decorator>
+            </div>
+        </section>
+        <h2>input select form demo</h2>
+        <section>
+            <div vertical layout wrap class="party-info-form">
+                <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
+                    <cg-input-tags required tags="{{tags}}" selected="{{selected}}" on-change="{{change}}"></cg-input-tags>
+                </paper-input-decorator>
+                <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
+                    <input required is="core-input">
+                </paper-input-decorator>
+            </div>
+        </section>
+    </section>
+</template>
+
+<script>
+    window.addEventListener('template-bound', function(){
+        var sandbox = document.getElementById('sandbox');
+
+        var o = ["Something 12 Banana 1","something 12 banana 3","Banana 10","banana 11","banana 12"];
+        for(var i = 0; i < 100; i++) {
+            o.push("item " + (i+1) + " value " + ((i+2)*10));
+        }
+
+        sandbox.change = function(){
+            sandbox.$.selected.innerText = sandbox.selected.toString();
+            sandbox.$.tags.innerText = sandbox.tags.length;
+        };
+        sandbox.tags = o;
+        sandbox.selected = [];//["banana 11","banana 12"];
+//        Polymer.job("", function(){
+//            sandbox.selected = sandbox.selected.slice();
+//        }.bind(this), 3000)
+    });
+</script>
+
+</body>
+</html>
