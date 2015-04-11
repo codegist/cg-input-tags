@@ -4,27 +4,34 @@
 <link href="../paper-shadow/paper-shadow.html" rel="import">
 <link href="../core-icon-button/core-icon-button.html" rel="import">
 <link href="../cg-input-select/cg-input-select.html" rel="import">
+<link href="../core-a11y-keys/core-a11y-keys.html" rel="import">
 <link href="cg-dropdown.html" rel="import">
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
 
 <polymer-element name="cg-input-tags" extends="cg-lightdom-element" attributes="label tags selected required">
     <template>
         <style>
+            cg-input-tags .tag-input {
+                cursor: text;
+            }
+            cg-input-tags .select {
+                cursor: pointer;
+            }
             cg-input-tags .placeholder {
                 color:#9a9a9a;
             }
-            /*cg-input-tags .tag-input {*/
-                /*padding:6px;*/
-            /*}*/
-            /*cg-input-tags .tag-input:hover {*/
-                /*border:1px solid #dddddd;*/
-                /*padding:5px;*/
-            /*}*/
-            cg-input-tags .tags paper-shadow {
+            cg-input-tags .tags .tag.selected {
+                outline:0;
+            }
+            cg-input-tags .tags .tag {
                 margin:3px;
                 padding:3px;
+                cursor:pointer;
             }
-            cg-input-tags .tags paper-shadow /deep/ core-icon {
+            cg-input-tags .tags .tag /deep/ core-icon:hover {
+                background-color:#dddddd;
+            }
+            cg-input-tags .tags .tag /deep/ core-icon {
                 width:16x!important;
                 height:16px!important;
                 color:#ee0000!important;
@@ -32,36 +39,42 @@
             cg-input-tags /deep/ core-icon {
                 color:rgb(0, 150, 136)!important;
             }
-            cg-input-tags cg-dropdown /deep/ paper-item:hover {
-                background-color:#dddddd;
+            html /deep/ cg-dropdown /deep/ paper-item.preselected,
+            html /deep/ cg-dropdown /deep/ paper-item:hover {
+                background-color:#dddddd!important;
             }
         </style>
         <input is="core-input" required?="{{required}}" value="{{selected}}" id="input" hidden>
-        <div layout horizontal on-tap="{{_select}}" class="tag-input">
-            <div flex class="tags" layout horizontal wrap center>
+        <div layout horizontal on-tap="{{_select}}" class="tag-input" id="tagInput" tabindex="0" >
+            <div flex >
                 <template if="{{selected.length > 0}}">
-                    <template repeat="{{selected as tag}}">
-                        <paper-shadow z="1">{{tag}}&nbsp;<core-icon icon="fa:minus-circle" on-tap="{{_delete}}" data-value="{{tag}}"></core-icon></paper-shadow>
-                    </template>
+                    <div id="tags" class="tags" layout horizontal wrap center>
+                        <template repeat="{{tag,i in selected}}">
+                            <paper-shadow tabindex="0" on-focus="{{_onSelectTag}}" on-blur="{{_onUnselectTag}}" on-tap="{{_onSelectTag}}" class="tag" data-index="{{i}}" data-tag="{{tag}}" z="1" animated layout horizontal center>{{tag}} <core-icon icon="fa:minus-circle" on-tap="{{_onDelete}}" data-tag="{{tag}}"></core-icon></paper-shadow>
+                        </template>
+                    </div>
                 </template>
                 <template if="{{selected.length == 0}}">
                     <span class="placeholder">{{label}}</span>
                 </template>
             </div>
             <div>
-                <core-icon icon="fa:caret-down" ></core-icon>
+                <core-icon tabindex="0" class="select" icon="fa:caret-down" ></core-icon>
             </div>
         </div>
         <div relative>
             <cg-dropdown id="dd" class="dropdown" on-core-select="{{_onAdd}}" layered>
-                <paper-input id="search" label="Search or new" role="header" on-keyup="{{_search}}" on-keypress="{{_selectOrNew}}"></paper-input>
+                <paper-input autofocus tabindex="0" id="search" label="Search or new" role="header" on-keyup="{{_search}}" on-keypress="{{_selectOrNew}}"></paper-input>
                 <core-menu class="menu" id="menu">
                     <template repeat="{{_tagsView as tag}}">
-                        <paper-item data-value="{{tag}}">{{tag}}</paper-item>
+                        <paper-item class="tag-item" on-focus="{{_preselectItem}}" on-blur="{{_deselectItem}}" tabindex="0" data-tag="{{tag}}">{{tag}}</paper-item>
                     </template>
                 </core-menu>
             </cg-dropdown>
         </div>
+        <core-a11y-keys id="ally" target="{{$.tags}}" keys="del" on-keys-pressed="{{_handleTagKey}}"></core-a11y-keys>
+        <core-a11y-keys id="ally1" target="{{$.tagInput}}" keys="down enter" on-keys-pressed="{{_handleDDKey}}"></core-a11y-keys>
+        <core-a11y-keys id="ally2" target="{{$.menu}}" keys="enter" on-keys-pressed="{{_handleDDListKey}}"></core-a11y-keys>
     </template>
     <script>
         Polymer("cg-input-tags", {
@@ -82,13 +95,36 @@
                 this._tags = this.tags.slice();
             },
             selectedChanged:function(){
+                if(this.selected.length + this._tags.length != this.tags.length) {
+                    this.tagsChanged();
+                }
                 for(var i = 0; i < this.selected.length; i++){
                     var tag = this.selected[i];
-                    this._tags.splice(this._tags.indexOf(tag), 1);
+                    var index = this._tags.indexOf(tag);
+                    index != -1 && this._tags.splice(index, 1);
                 }
                 this.$.input.value = this.selected.toString();
                 this._decoratorElement && this._decoratorElement.inputChanged();
                 this.fire("change", this.selected);
+            },
+            _onUnselectTag:function(e){
+                this._unselectTag(e.currentTarget);
+                e.stopPropagation();
+            },
+            _unselectTag:function(e){
+                e.classList.remove("selected");
+                e.setZ(1);
+            },
+            _onSelectTag:function(e){
+                var selected = this.querySelector(".tag.selected");
+                selected && this._unselectTag(selected);
+                this._selectTag(e.currentTarget);
+                e.stopPropagation();
+            },
+            _selectTag:function(e){
+                e.classList.add("selected");
+                e.setZ(2);
+                e.focus();
             },
             _tagsChanged:function(){
                 this._tagsView = this._tags.slice();
@@ -96,9 +132,13 @@
             _select:function(e){
                 this.$.dd.toggle();
             },
+            _onDelete:function(e){
+                this._delete(e.currentTarget);
+                e.stopPropagation();
+            },
             _delete:function(e){
                 for(var i = 0; i < this.selected.length; i++) {
-                    if(this.selected[i] == e.currentTarget.dataset.value) {
+                    if(this.selected[i] == e.dataset.tag) {
                         var o = this.selected.splice(i, 1)[0];
                         if (this.tags.indexOf(o) != -1) {
                             this._tags.splice(0, 0, o);
@@ -106,23 +146,18 @@
                         break;
                     }
                 }
-                e.stopPropagation();
             },
             _onAdd:function(e) {
-                this._add(e.detail.item.dataset.value);
+                this._add(e.detail.item.dataset.tag);
             },
             _add:function(tag){
-                for(var i = 0; i < this.selected.length; i++) {
-                    if(this.selected[i] == tag) {
-                        return;
-                    }
+                if(this.selected.indexOf(tag) != -1) {
+                    return;
                 }
                 this.selected.push(tag);
                 this._decoratorElement && this._decoratorElement.inputChanged();
                 this.$.menu.selected = null;
             },
-
-
             _selectOrNew:function(e){
                 if(e.keyCode != 13) {
                     return;
@@ -175,6 +210,52 @@
                     from: from,
                     to: to
                 };
+            },
+            _deselectItem:function(e){
+                e.currentTarget.classList.remove("preselected");
+            },
+            _preselectItem:function(e){
+                e.currentTarget.classList.add("preselected");
+                e.currentTarget.focus();
+            },
+            _handleDDListKey:function(e, detail, sender){
+                var preselected = this.$.menu.querySelector("paper-item.tag-item.preselected")
+                if(preselected) {
+                    this.$.menu.selected = preselected;
+                    this._add(preselected.dataset.tag);
+                    if(preselected.previousElementSibling.classList.contains("tag-item")) {
+                        preselected.previousElementSibling.focus();
+                    }else if(preselected.nextElementSibling.classList.contains("tag-item")) {
+                        preselected.nextElementSibling.focus();
+                    }
+                }
+            },
+            _handleDDKey:function(e, detail, sender){
+                if(document.activeElement.classList.contains("tag")) {
+                    return;
+                }
+                this._select();
+            },
+            _handleTagKey:function(e, detail, sender){
+                console.log("_handleTagKey");
+                if(detail.key == "down" || detail.key == "enter") {
+                    e.stopPropagation();
+                    return;
+                }
+                var selected = this.querySelector(".tag.selected");
+                if(selected) {
+                    this._delete(selected);
+                    this.async(function(){
+                        if (this.selected.length > 0) {
+                            var tag = this.querySelector(".tag[data-index='" + (selected.dataset.index) + "']");
+                            if(!tag) {
+                                tag = this.querySelector(".tag[data-index='" + (selected.dataset.index - 1) + "']");
+                            }
+                            this._selectTag(tag);
+                        }
+                    }.bind(this), null, 100);
+
+                }
             }
         });
     </script>
