@@ -27,6 +27,7 @@
                 margin:3px;
                 padding:3px;
                 cursor:pointer;
+                border-radius: 5px;
             }
             cg-input-tags .tags .tag /deep/ core-icon:hover {
                 background-color:#dddddd;
@@ -105,7 +106,7 @@
                 }
                 this.$.input.value = this.selected.toString();
                 this._decoratorElement && this._decoratorElement.inputChanged();
-                this.fire("change", this.selected);
+               // this.fire("change", this.selected); TODO WHY ? UNCOMMENTED FOR SOME REASON cg-event-quickeditor dialog opens and closes up immediately
             },
             _onUnselectTag:function(e){
                 this._unselectTag(e.currentTarget);
@@ -237,7 +238,6 @@
                 this._select();
             },
             _handleTagKey:function(e, detail, sender){
-                console.log("_handleTagKey");
                 if(detail.key == "down" || detail.key == "enter") {
                     e.stopPropagation();
                     return;
