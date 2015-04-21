@@ -8,50 +8,59 @@
 <link href="cg-dropdown.html" rel="import">
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
 
-<polymer-element name="cg-input-tags" extends="cg-lightdom-element" attributes="label tags selected required">
+<polymer-element name="cg-input-tags" attributes="label tags selected required">
     <template>
         <style>
-            cg-input-tags .tag-input {
+            .tag-input {
                 cursor: text;
             }
-            cg-input-tags .select {
+            .select {
                 cursor: pointer;
             }
-            cg-input-tags .placeholder {
+            .placeholder {
                 color:#9a9a9a;
             }
-            cg-input-tags .tags .tag.selected {
+            .tags .tag.selected  {
                 outline:0;
             }
-            cg-input-tags .tags .tag {
+            .tags .tag {
                 margin:3px;
-                padding:3px;
                 cursor:pointer;
+            }
+            .tags .tag span {
+                margin:3px;
+                cursor:pointer;
+            }
+            .tags .tag paper-shadow{
                 border-radius: 5px;
             }
-            cg-input-tags .tags .tag /deep/ core-icon:hover {
+            .tags .tag /deep/ core-icon:hover {
                 background-color:#dddddd;
             }
-            cg-input-tags .tags .tag /deep/ core-icon {
-                width:16x!important;
+            .tags .tag /deep/ core-icon {
+                width:16px!important;
                 height:16px!important;
                 color:#ee0000!important;
             }
-            cg-input-tags /deep/ core-icon {
+            :host /deep/ core-icon {
                 color:rgb(0, 150, 136)!important;
             }
-            html /deep/ cg-dropdown /deep/ paper-item.preselected,
-            html /deep/ cg-dropdown /deep/ paper-item:hover {
+            :host /deep/ cg-dropdown /deep/ paper-item.preselected,
+            :host /deep/ cg-dropdown /deep/ paper-item:hover {
                 background-color:#dddddd!important;
             }
         </style>
         <input is="core-input" required?="{{required}}" value="{{selected}}" id="input" hidden>
         <div layout horizontal on-tap="{{_select}}" class="tag-input" id="tagInput" tabindex="0" >
-            <div flex >
+            <div flex>
                 <template if="{{selected.length > 0}}">
                     <div id="tags" class="tags" layout horizontal wrap center>
                         <template repeat="{{tag,i in selected}}">
-                            <paper-shadow tabindex="0" on-focus="{{_onSelectTag}}" on-blur="{{_onUnselectTag}}" on-tap="{{_onSelectTag}}" class="tag" data-index="{{i}}" data-tag="{{tag}}" z="1" animated layout horizontal center>{{tag}} <core-icon icon="fa:minus-circle" on-tap="{{_onDelete}}" data-tag="{{tag}}"></core-icon></paper-shadow>
+                            <div tabindex="0" class="tag" relative layout horizontal center on-focus="{{_onSelectTag}}" on-blur="{{_onUnselectTag}}" on-tap="{{_onSelectTag}}"  data-index="{{i}}" data-tag="{{tag}}" >
+                                <paper-shadow z="1" animated fit></paper-shadow>
+                                <span>{{tag}}</span>
+                                <core-icon icon="fa:minus-circle" on-tap="{{_onDelete}}" data-tag="{{tag}}"></core-icon>
+                            </div>
                         </template>
                     </div>
                 </template>
@@ -89,6 +98,7 @@
             domReady:function(){
                 if(this.parentElement.tagName.toLowerCase() == "paper-input-decorator") {
                     this._decoratorElement = this.parentElement; // _decoratorElement thing's quite nasty..
+                    this._decoratorElement.input = this.$.input; // _decoratorElement thing's quite nasty..
                     this.label = this._decoratorElement.getAttribute("label");
                 }
             },
@@ -114,7 +124,7 @@
             },
             _unselectTag:function(e){
                 e.classList.remove("selected");
-                e.setZ(1);
+                e.querySelector("paper-shadow").setZ(1);
             },
             _onSelectTag:function(e){
                 var selected = this.querySelector(".tag.selected");
@@ -124,7 +134,7 @@
             },
             _selectTag:function(e){
                 e.classList.add("selected");
-                e.setZ(2);
+                e.querySelector("paper-shadow").setZ(2);
                 e.focus();
             },
             _tagsChanged:function(){
