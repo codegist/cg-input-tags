@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>cg-datetime-input Demo</title>
     <link rel="import" href="../paper-input/paper-input-decorator.html">
+    <link rel="import" href="../cg-datasource/cg-datasource-rest.html">
     <link rel="import" href="cg-input-tags.html">
     <style>
         .demo {
@@ -21,6 +22,7 @@
 <body unresolved fullbleed layout vertical center center-justified>
 
 <template id="sandbox" is="auto-binding">
+    <cg-datasource-rest></cg-datasource-rest>
     <section layout vertical left>
         <h2>tag input demo</h2>
         <section>
@@ -66,7 +68,7 @@
             sandbox.$.selected.innerText = sandbox.selected.toString();
             sandbox.$.tags.innerText = sandbox.tags.length;
         };
-        sandbox.tags = o;
+//        sandbox.tags = o;
         sandbox.selected = ["banana 11","banana 12"];
 //        Polymer.job("", function(){
 //            sandbox.selected = sandbox.selected.slice();

@@ -7,8 +7,9 @@
 <link href="../core-a11y-keys/core-a11y-keys.html" rel="import">
 <link href="cg-dropdown.html" rel="import">
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
+<link rel="import" href="../cg-base/cg-base.html">
 
-<polymer-element name="cg-input-tags" attributes="label tags selected required">
+<polymer-element name="cg-input-tags" extends="cg-base" attributes="label tags selected required datarequest">
     <template>
         <style>
             .tag-input {
@@ -90,7 +91,7 @@
         Polymer("cg-input-tags", {
             label:null,
             required:false,
-            tags:[],
+            tags:null,
             selected:[],
             _tags:[],
             _tagsView:[],
@@ -101,11 +102,23 @@
                     this._decoratorElement.input = this.$.input; // _decoratorElement thing's quite nasty..
                     this.label = this._decoratorElement.getAttribute("label");
                 }
+                if(this.tags == null) {
+                    console.log("[cg-input-tags] no tags provided firing data request");
+                    this.fireDataRequest('tag-list', null, function(response){
+                        this.tags = response.data;
+                        this.async(this.selectedChanged.bind(this), null, 100)
+                    }.bind(this));
+                }else{
+                    console.log("[cg-input-tags] tags provided, using them");
+                }
             },
             tagsChanged:function(){
                 this._tags = this.tags.slice();
             },
             selectedChanged:function(){
+                if(!this.tags) {
+                    return;
+                }
                 if(this.selected.length + this._tags.length != this.tags.length) {
                     this.tagsChanged();
                 }
@@ -116,7 +129,7 @@
                 }
                 this.$.input.value = this.selected.toString();
                 this._decoratorElement && this._decoratorElement.inputChanged();
-               // this.fire("change", this.selected); TODO WHY ? UNCOMMENTED FOR SOME REASON cg-event-quickeditor dialog opens and closes up immediately
+               // this.fire("change", this.selected); TODO WHY ? UNCOMMENTED FOR SOME REASON cg-event-editor dialog opens and closes up immediately
             },
             _onUnselectTag:function(e){
                 this._unselectTag(e.currentTarget);
