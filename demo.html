@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>cg-datetime-input Demo</title>
     <link rel="import" href="../paper-input/paper-input-decorator.html">
-    <link rel="import" href="../cg-datasource/cg-datasource-rest.html">
+    <link rel="import" href="cg-datasource-testdata.html">
     <link rel="import" href="cg-input-tags.html">
     <style>
         .demo {
@@ -22,37 +22,54 @@
 <body unresolved fullbleed layout vertical center center-justified>
 
 <template id="sandbox" is="auto-binding">
-    <cg-datasource-rest></cg-datasource-rest>
-    <section layout vertical left>
-        <h2>tag input demo</h2>
-        <section>
-            <p>Selected: <span id="selected"></span></p>
-            <p>total tags: <span id="tags"></span></p>
-            <cg-input-tags required tags="{{tags}}" selected="{{selected}}" label="Tags" on-change="{{change}}"></cg-input-tags>
+    <cg-datasource-testdata></cg-datasource-testdata>
+    <div layout horizontal wrap>
+        <section layout vertical left>
+            <h2>With data selected</h2>
+            <section>
+                <cg-input-tags required tags="{{tags}}" selected="{{selected1}}" label="Tags"></cg-input-tags>
+            </section>
         </section>
-        <h2>input select form demo</h2>
-        <section>
-            <div horizontal layout wrap class="party-info-form">
-                <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
-                    <cg-input-tags required tags="{{tags}}" selected="{{selected}}" on-change="{{change}}"></cg-input-tags>
-                </paper-input-decorator>
-                <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
-                    <input required is="core-input">
-                </paper-input-decorator>
-            </div>
+        <section layout vertical left>
+            <h2>With data not selected</h2>
+            <section>
+                <div horizontal layout wrap class="party-info-form">
+                    <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
+                        <cg-input-tags required tags="{{tags}}"></cg-input-tags>
+                    </paper-input-decorator>
+                    <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
+                        <input required is="core-input">
+                    </paper-input-decorator>
+                </div>
+            </section>
         </section>
-        <h2>input select form demo</h2>
-        <section>
-            <div vertical layout wrap class="party-info-form">
-                <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
-                    <cg-input-tags required tags="{{tags}}" selected="{{selected}}" on-change="{{change}}"></cg-input-tags>
-                </paper-input-decorator>
-                <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
-                    <input required is="core-input">
-                </paper-input-decorator>
-            </div>
+        <section layout vertical left>
+            <h2>With datasource selected</h2>
+            <section>
+                <div vertical layout wrap class="party-info-form">
+                    <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
+                        <cg-input-tags required dataTagPrefix="demo" selected="{{selected3}}"></cg-input-tags>
+                    </paper-input-decorator>
+                    <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
+                        <input required is="core-input">
+                    </paper-input-decorator>
+                </div>
+            </section>
         </section>
-    </section>
+        <section layout vertical left>
+            <h2>With datasource not selected</h2>
+            <section>
+                <div vertical layout wrap class="party-info-form">
+                    <paper-input-decorator label="Tags" floatingLabel error="input is required!" autoValidate>
+                        <cg-input-tags required dataTagPrefix="demo"></cg-input-tags>
+                    </paper-input-decorator>
+                    <paper-input-decorator label="DNI" floatingLabel error="input is required!" autoValidate>
+                        <input required is="core-input">
+                    </paper-input-decorator>
+                </div>
+            </section>
+        </section>
+    </div>
 </template>
 
 <script>
@@ -63,13 +80,9 @@
         for(var i = 0; i < 100; i++) {
             o.push("item " + (i+1) + " value " + ((i+2)*10));
         }
-
-        sandbox.change = function(){
-            sandbox.$.selected.innerText = sandbox.selected.toString();
-            sandbox.$.tags.innerText = sandbox.tags.length;
-        };
-//        sandbox.tags = o;
-        sandbox.selected = ["banana 11","banana 12"];
+        sandbox.tags = o;
+        sandbox.selected1 = ["banana 11","banana 12"];
+        sandbox.selected3 = ["hello","there"];
 //        Polymer.job("", function(){
 //            sandbox.selected = sandbox.selected.slice();
 //        }.bind(this), 3000)
