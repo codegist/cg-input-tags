@@ -123,7 +123,7 @@
                 this._tags = this.tags.slice();
             },
             selectedChanged:function(){
-                if(!this.tags) {
+                if(!this.tags || !this.selected) {
                     return;
                 }
                 if(this.selected.length + this._tags.length != this.tags.length) {
