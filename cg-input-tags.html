@@ -111,10 +111,14 @@
                 }
                 if(this.tags == null) {
                     console.log("[cg-input-tags] no tags provided firing data request");
-                    this.fireDataRequest('tag-list', function(response){
-                        this.tags = response.data;
-                        this.async(this.selectedChanged.bind(this), null, 100)
-                    }.bind(this));
+                    this.fireDataRequest({
+                        type:'tag-list',
+                        success:function(response){
+                            this.tags = response.data;
+                            this.async(this.selectedChanged.bind(this), null, 100)
+                        }.bind(this),
+                        failure:function(response){}.bind(this)
+                    });
                 }else{
                     console.log("[cg-input-tags] tags provided, using them");
                 }
