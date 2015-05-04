@@ -1,0 +1,16 @@
+{
+  "name": "cg-input-tags",
+  "version": "1.0.0",
+  "private": false,
+  "dependencies": {
+    "polymer": "Polymer/polymer#^0.5",
+    "core-menu": "Polymer/core-menu#^0.5",
+    "paper-dropdown": "Polymer/paper-dropdown#^0.5",
+    "paper-dropdown-menu": "Polymer/paper-dropdown-menu#^0.5",
+    "cg-lightdom-element": "codegist/cg-lightdom-element#^1.0.0"
+  },
+  "devDependencies": {
+    "paper-input-decorator": "Polymer/paper-input-decorator#^0.5",
+    "web-component-tester": "*"
+  }
+}

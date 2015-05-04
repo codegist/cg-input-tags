@@ -1,0 +1,296 @@
+<link href="../polymer/polymer.html" rel="import">
+<link href="../core-menu/core-menu.html" rel="import">
+<link href="../paper-input/paper-input.html" rel="import">
+<link href="../paper-shadow/paper-shadow.html" rel="import">
+<link href="../core-icon-button/core-icon-button.html" rel="import">
+<link href="../cg-input-select/cg-input-select.html" rel="import">
+<link href="../core-a11y-keys/core-a11y-keys.html" rel="import">
+<link href="cg-dropdown.html" rel="import">
+<link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
+<link rel="import" href="../cg-base/cg-base.html">
+
+<polymer-element name="cg-input-tags" extends="cg-base" attributes="label tags selected required dataTagPrefix">
+    <template>
+        <style>
+            .tag-input {
+                cursor: text;
+            }
+            .select {
+                cursor: pointer;
+            }
+            .placeholder {
+                color:#9a9a9a;
+            }
+            .tags .tag.selected  {
+                outline:0;
+            }
+            .tags .tag {
+                margin:3px;
+                cursor:pointer;
+            }
+            .tags .tag span {
+                margin:3px;
+                cursor:pointer;
+            }
+            .tags .tag paper-shadow{
+                border-radius: 5px;
+            }
+            .tags .tag /deep/ core-icon:hover {
+                background-color:#dddddd;
+            }
+            .tags .tag /deep/ core-icon {
+                width:16px!important;
+                height:16px!important;
+                color:#d34336!important;
+            }
+            :host /deep/ core-icon {
+                color:rgb(0, 150, 136)!important;
+            }
+            :host /deep/ cg-dropdown /deep/ paper-item.preselected,
+            :host /deep/ cg-dropdown /deep/ paper-item:hover {
+                background-color:#dddddd!important;
+            }
+        </style>
+        <input is="core-input" required?="{{required}}" value="{{selected}}" id="input" hidden>
+        <div layout horizontal on-tap="{{_select}}" class="tag-input" id="tagInput" tabindex="0" >
+            <div flex>
+                <template if="{{selected.length > 0}}">
+                    <div id="tags" class="tags" layout horizontal wrap center>
+                        <template repeat="{{tag,i in selected}}">
+                            <div tabindex="0" class="tag" relative layout horizontal center on-focus="{{_onSelectTag}}" on-blur="{{_onUnselectTag}}" on-tap="{{_onSelectTag}}"  data-index="{{i}}" data-tag="{{tag}}" >
+                                <paper-shadow z="1" animated fit></paper-shadow>
+                                <span>{{tag}}</span>
+                                <core-icon icon="fa:minus-circle" on-tap="{{_onDelete}}" data-tag="{{tag}}"></core-icon>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <template if="{{selected.length == 0}}">
+                    <span class="placeholder">{{label}}</span>
+                </template>
+            </div>
+            <div>
+                <core-icon tabindex="0" class="select" icon="fa:caret-down" ></core-icon>
+            </div>
+        </div>
+        <div relative>
+            <cg-dropdown id="dd" class="dropdown" on-core-select="{{_onAdd}}" layered>
+                <paper-input autofocus tabindex="0" id="search" label="Search or new" role="header" on-keyup="{{_search}}" on-keypress="{{_selectOrNew}}"></paper-input>
+                <core-menu class="menu" id="menu">
+                    <template repeat="{{_tagsView as tag}}">
+                        <paper-item class="tag-item" on-focus="{{_preselectItem}}" on-blur="{{_deselectItem}}" tabindex="0" data-tag="{{tag}}">{{tag}}</paper-item>
+                    </template>
+                </core-menu>
+            </cg-dropdown>
+        </div>
+        <core-a11y-keys id="ally" target="{{$.tags}}" keys="del" on-keys-pressed="{{_handleTagKey}}"></core-a11y-keys>
+        <core-a11y-keys id="ally1" target="{{$.tagInput}}" keys="down enter" on-keys-pressed="{{_handleDDKey}}"></core-a11y-keys>
+        <core-a11y-keys id="ally2" target="{{$.menu}}" keys="enter" on-keys-pressed="{{_handleDDListKey}}"></core-a11y-keys>
+    </template>
+    <script>
+        Polymer("cg-input-tags", {
+            label:null,
+            required:false,
+            tags:null,
+            selected:null,
+            _tags:null,
+            _tagsView:null,
+            _decoratorElement:null,
+            created:function(){
+                this.super();
+                // if set in json object, array is shared across instances!
+                this.selected= [];
+                this._tags = [];
+                this._tagsView = [];
+            },
+            domReady:function(){
+                if(this.parentElement.tagName.toLowerCase() == "paper-input-decorator") {
+                    this._decoratorElement = this.parentElement; // _decoratorElement thing's quite nasty..
+                    this._decoratorElement.input = this.$.input; // _decoratorElement thing's quite nasty..
+                    this.label = this._decoratorElement.getAttribute("label");
+                }
+                if(this.tags == null) {
+                    console.log("[cg-input-tags] no tags provided firing data request");
+                    this.fireDataRequest({
+                        type:'tag-list',
+                        success:function(response){
+                            this.tags = response.data;
+                            this.async(this.selectedChanged.bind(this), null, 100)
+                        }.bind(this),
+                        failure:function(response){}.bind(this)
+                    });
+                }else{
+                    console.log("[cg-input-tags] tags provided, using them");
+                }
+            },
+            tagsChanged:function(){
+                this._tags = this.tags.slice();
+            },
+            selectedChanged:function(){
+                if(!this.tags || !this.selected) {
+                    return;
+                }
+                if(this.selected.length + this._tags.length != this.tags.length) {
+                    this.tagsChanged();
+                }
+                for(var i = 0; i < this.selected.length; i++){
+                    var tag = this.selected[i];
+                    var index = this._tags.indexOf(tag);
+                    index != -1 && this._tags.splice(index, 1);
+                }
+                this.$.input.value = this.selected.toString();
+                this._decoratorElement && this._decoratorElement.inputChanged();
+               // this.fire("change", this.selected); TODO WHY ? UNCOMMENTED FOR SOME REASON cg-event-editor dialog opens and closes up immediately
+            },
+            _onUnselectTag:function(e){
+                this._unselectTag(e.currentTarget);
+                e.stopPropagation();
+            },
+            _unselectTag:function(e){
+                e.classList.remove("selected");
+                e.querySelector("paper-shadow").setZ(1);
+            },
+            _onSelectTag:function(e){
+                var selected = this.querySelector(".tag.selected");
+                selected && this._unselectTag(selected);
+                this._selectTag(e.currentTarget);
+                e.stopPropagation();
+            },
+            _selectTag:function(e){
+                e.classList.add("selected");
+                e.querySelector("paper-shadow").setZ(2);
+                e.focus();
+            },
+            _tagsChanged:function(){
+                this._tagsView = this._tags.slice();
+            },
+            _select:function(e){
+                this.$.dd.toggle();
+            },
+            _onDelete:function(e){
+                this._delete(e.currentTarget);
+                e.stopPropagation();
+            },
+            _delete:function(e){
+                for(var i = 0; i < this.selected.length; i++) {
+                    if(this.selected[i] == e.dataset.tag) {
+                        var o = this.selected.splice(i, 1)[0];
+                        if (this.tags.indexOf(o) != -1) {
+                            this._tags.splice(0, 0, o);
+                        }
+                        break;
+                    }
+                }
+            },
+            _onAdd:function(e) {
+                this._add(e.detail.item.dataset.tag);
+            },
+            _add:function(tag){
+                if(this.selected.indexOf(tag) != -1) {
+                    return;
+                }
+                this.selected.push(tag);
+                this._decoratorElement && this._decoratorElement.inputChanged();
+                this.$.menu.selected = null;
+            },
+            _selectOrNew:function(e){
+                if(e.keyCode != 13) {
+                    return;
+                }
+                if(this._tagsView.length == 1) {
+                    this._add(this._tagsView[0]);
+                }else{
+                    var tag = this.$.search.value;
+                    for(var i = 0; i < this.selected.length; i++) {
+                        if(this.selected[i] == tag) {
+                            return;
+                        }
+                    }
+                    this.selected.push(tag);
+                }
+            },
+            _search:function(e){
+                var highRelevance = [];
+                var lowRelevance = [];
+                this._tags.forEach(function(e){
+                    var bounds = this._getMatchBounds(e);
+                    if(bounds.matches) {
+                        if (bounds.from == 0) {
+                            highRelevance.push(e);
+                        } else {
+                            lowRelevance.push(e);
+                        }
+                    }
+                }.bind(this));
+                var results = highRelevance.concat(lowRelevance);
+                this._tagsView = results;
+            },
+            _getMatchBounds:function(tag){
+                var search = String(this.$.search.value).toLowerCase();
+                if(search.length == 0) {
+                    return {
+                        empty : true,
+                        matches : true,
+                        from : -1,
+                        to : -1
+                    };
+                }
+                var value = tag.toLowerCase();
+                var from =  value.indexOf(search);
+                var matches =  from > -1;
+                var to = matches ? from + search.length : -1;
+                return {
+                    empty:false,
+                    matches: from > -1,
+                    from: from,
+                    to: to
+                };
+            },
+            _deselectItem:function(e){
+                e.currentTarget.classList.remove("preselected");
+            },
+            _preselectItem:function(e){
+                e.currentTarget.classList.add("preselected");
+                e.currentTarget.focus();
+            },
+            _handleDDListKey:function(e, detail, sender){
+                var preselected = this.$.menu.querySelector("paper-item.tag-item.preselected")
+                if(preselected) {
+                    this.$.menu.selected = preselected;
+                    this._add(preselected.dataset.tag);
+                    if(preselected.previousElementSibling.classList.contains("tag-item")) {
+                        preselected.previousElementSibling.focus();
+                    }else if(preselected.nextElementSibling.classList.contains("tag-item")) {
+                        preselected.nextElementSibling.focus();
+                    }
+                }
+            },
+            _handleDDKey:function(e, detail, sender){
+                if(document.activeElement.classList.contains("tag")) {
+                    return;
+                }
+                this._select();
+            },
+            _handleTagKey:function(e, detail, sender){
+                if(detail.key == "down" || detail.key == "enter") {
+                    e.stopPropagation();
+                    return;
+                }
+                var selected = this.querySelector(".tag.selected");
+                if(selected) {
+                    this._delete(selected);
+                    this.async(function(){
+                        if (this.selected.length > 0) {
+                            var tag = this.querySelector(".tag[data-index='" + (selected.dataset.index) + "']");
+                            if(!tag) {
+                                tag = this.querySelector(".tag[data-index='" + (selected.dataset.index - 1) + "']");
+                            }
+                            this._selectTag(tag);
+                        }
+                    }.bind(this), null, 100);
+
+                }
+            }
+        });
+    </script>
+</polymer-element>

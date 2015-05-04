@@ -1,0 +1,24 @@
+<link href="../polymer/polymer.html" rel="import">
+<link href="../cg-datasource/cg-datasource-base.html" rel="import">
+
+<polymer-element name="cg-datasource-testdata" extends="cg-datasource-base">
+    <script>
+        (function() {
+            console.log("##################################################");
+            console.log("cg-datasource-testdata INIT");
+            console.log("##################################################");
+
+            Polymer({
+                getProvidersMap:function(){
+                    return {
+                        'demo-tag-list':this.getTags,
+                    };
+                },
+                getTags:function(callback, params){
+                    console.log("### Datasource[TestData] getColors(params:"+JSON.stringify(params)+")");
+                    return callback({success:true,data:["hello","there","1","banana","hey there"]});
+                }
+            });
+        })();
+    </script>
+</polymer-element>
