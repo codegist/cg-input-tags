@@ -104,7 +104,7 @@
                 this._tagsView = [];
             },
             domReady:function(){
-                console.log("["+this.constructor.name+"] domReady");
+                this.super();
                 if(this.parentElement.tagName.toLowerCase() == "paper-input-decorator") {
                     this._decoratorElement = this.parentElement; // _decoratorElement thing's quite nasty..
                     this._decoratorElement.input = this.$.input; // _decoratorElement thing's quite nasty..
