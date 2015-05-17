@@ -9,7 +9,7 @@
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
 <link rel="import" href="../cg-base/cg-base.html">
 
-<polymer-element name="cg-input-tags" extends="cg-base" attributes="label tags selected required dataTagPrefix">
+<polymer-element name="cg-input-tags" extends="cg-base" cgName="tags" attributes="label tags selected required dataTagPrefix">
     <template>
         <style>
             .tag-input {
@@ -113,7 +113,7 @@
                 if(this.tags == null) {
                     console.log("[cg-input-tags] no tags provided firing data request");
                     this.fireDataRequest({
-                        type:'tag-list',
+                        type:'data',
                         success:function(response){
                             this.tags = response.data;
                             this.async(this.selectedChanged.bind(this), null, 100)
