@@ -110,7 +110,7 @@
                     this._decoratorElement.input = this.$.input; // _decoratorElement thing's quite nasty..
                     this.label = this._decoratorElement.getAttribute("label");
                 }
-                if(this.tags == null) {
+                if(this.isDataAware() && this.tags == null) {
                     console.log("[cg-input-tags] no tags provided firing data request");
                     this.fireDataRequest({
                         type:'data',
