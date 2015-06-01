@@ -1,24 +1,23 @@
 <link href="../polymer/polymer.html" rel="import">
-<link href="../cg-datasource/cg-datasource-base.html" rel="import">
+<link href="../cg-base/cg-base-behavior.html" rel="import">
 
-<polymer-element name="cg-datasource-testdata" extends="cg-datasource-base">
-    <script>
-        (function() {
-            console.log("##################################################");
-            console.log("cg-datasource-testdata INIT");
-            console.log("##################################################");
-
-            Polymer({
-                getProvidersMap:function(){
-                    return {
-                        'demo-tag-list':this.getTags,
-                    };
-                },
-                getTags:function(callback, params){
-                    console.log("### Datasource[TestData] getColors(params:"+JSON.stringify(params)+")");
-                    return callback({success:true,data:["hello","there","1","banana","hey there"]});
+<dom-module id="odous-datasource-testdata">
+</dom-module>
+<script>
+    Polymer({
+        is:'odous-datasource-testdata',
+        properties:{
+            providersMap:{
+                type:Object,
+                value:{
+                    'demo-tag-list':this.getTags,
                 }
-            });
-        })();
-    </script>
-</polymer-element>
+            }
+        },
+        behaviors:[CG.DataSourceBaseBehavior],
+        getTags:function(options){
+            console.log("### Datasource[TestData] getColors(params:"+JSON.stringify(options)+")");
+            return options.success({success:true,data:["hello","there","1","banana","hey there"]});
+        }
+    });
+</script>
