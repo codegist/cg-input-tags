@@ -1,115 +1,173 @@
-<link href="../polymer/polymer.html" rel="import">
-<link href="../core-menu/core-menu.html" rel="import">
-<link href="../paper-input/paper-input.html" rel="import">
-<link href="../paper-shadow/paper-shadow.html" rel="import">
-<link href="../core-icon-button/core-icon-button.html" rel="import">
-<link href="../cg-input-select/cg-input-select.html" rel="import">
-<link href="../core-a11y-keys/core-a11y-keys.html" rel="import">
-<link href="cg-dropdown.html" rel="import">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-a11y-keys/iron-a11y-keys.html">
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
-<link rel="import" href="../cg-base/cg-base.html">
+<link rel="import" href="../cg-dropdown/cg-dropdown.html">
+<link rel="import" href="../cg-base/cg-base-behavior.html">
+<link rel="import" href="../cg-base/cg-required-validator.html">
+<link rel="import" href="../cg-base/cg-validatable-behavior.html">
 
-<polymer-element name="cg-input-tags" extends="cg-base" cgName="tags" attributes="label tags selected required">
+<dom-module id="cg-input-tags">
+    <style>
+        .wrapper .tag-input {
+            cursor: text;
+        }
+        .wrapper .select {
+            cursor: pointer;
+        }
+        .wrapper .placeholder {
+            color:#9a9a9a;
+        }
+        .wrapper .tags .tag.selected  {
+            outline:0;
+        }
+        .wrapper .tags .tag {
+            margin:3px;
+            cursor:pointer;
+        }
+        .wrapper .tags .tag span {
+            margin:3px;
+            cursor:pointer;
+        }
+        .wrapper .tags .tag paper-material{
+            border-radius: 5px;
+        }
+        .wrapper .tags .tag iron-icon:hover {
+            background-color:#dddddd;
+        }
+        .wrapper .tags .tag iron-icon {
+            width:16px;
+            height:16px;
+            color:#d34336;
+        }
+        .wrapper iron-icon {
+            color:rgb(0, 150, 136);
+        }
+        .wrapper cg-dropdown paper-item.preselected,
+        .wrapper cg-dropdown paper-item:hover {
+            background-color:#dddddd;
+        }
+
+        .wrapper cg-dropdown ::content #dd-menu {
+            max-height:200px;
+            overflow:auto;
+            margin:5px;
+        }
+
+        .wrapper .tag-input {
+            @apply(--layout-horizontal);
+        }
+        .wrapper .tag-input .tags-wrapper {
+            @apply(--layout-flex);
+        }
+        .wrapper .tag-input .tags-wrapper .tags {
+            @apply(--layout-horizontal);
+            @apply(--layout-wrap);
+            @apply(--layout-center);
+        }
+        .wrapper .tag-input .tags-wrapper .tags .tag {
+            @apply(--layout-horizontal);
+            @apply(--layout-center);
+            @apply(--layout-relative);
+        }
+        .wrapper .tag-input .tags-wrapper .tags .tag paper-material {
+            @apply(--layout-fit);
+        }
+    </style>
     <template>
-        <style>
-            .tag-input {
-                cursor: text;
-            }
-            .select {
-                cursor: pointer;
-            }
-            .placeholder {
-                color:#9a9a9a;
-            }
-            .tags .tag.selected  {
-                outline:0;
-            }
-            .tags .tag {
-                margin:3px;
-                cursor:pointer;
-            }
-            .tags .tag span {
-                margin:3px;
-                cursor:pointer;
-            }
-            .tags .tag paper-shadow{
-                border-radius: 5px;
-            }
-            .tags .tag /deep/ core-icon:hover {
-                background-color:#dddddd;
-            }
-            .tags .tag /deep/ core-icon {
-                width:16px!important;
-                height:16px!important;
-                color:#d34336!important;
-            }
-            :host /deep/ core-icon {
-                color:rgb(0, 150, 136)!important;
-            }
-            :host /deep/ cg-dropdown /deep/ paper-item.preselected,
-            :host /deep/ cg-dropdown /deep/ paper-item:hover {
-                background-color:#dddddd!important;
-            }
-        </style>
-        <input is="core-input" required?="{{required}}" value="{{selected}}" id="input" hidden>
-        <div layout horizontal on-tap="{{_select}}" class="tag-input" id="tagInput" tabindex="0" >
-            <div flex>
-                <template if="{{selected.length > 0}}">
-                    <div id="tags" class="tags" layout horizontal wrap center>
-                        <template repeat="{{tag,i in selected}}">
-                            <div tabindex="0" class="tag" relative layout horizontal center on-focus="{{_onSelectTag}}" on-blur="{{_onUnselectTag}}" on-tap="{{_onSelectTag}}"  data-index="{{i}}" data-tag="{{tag}}" >
-                                <paper-shadow z="1" animated fit></paper-shadow>
-                                <span>{{tag}}</span>
-                                <core-icon icon="fa:minus-circle" on-tap="{{_onDelete}}" data-tag="{{tag}}"></core-icon>
+        <div class="wrapper">
+            <cg-required-validator required="[[required]]"></cg-required-validator>
+            <div on-tap="_select" class="tag-input" id="tagInput" tabindex="0" >
+                <div class="tags-wrapper">
+                    <span class="placeholder" hidden$="[[hasSelected(selected, selected.length)]]">[[label]]</span>
+                    <div id="tags" class="tags">
+                        <template is="dom-repeat" items="[[selected]]" as="tag" >
+                            <div tabindex="0" class="tag"
+                                 on-focus="_onSelectTag"
+                                 on-blur="_onUnselectTag"
+                                 on-tap="_onSelectTag"  data-index$="[[index]]" data-tag$="[[tag]]">
+                                <paper-material elevation="1" animated fit></paper-material>
+                                <span>[[tag]]</span>
+                                <iron-icon icon="fa:minus-circle" on-tap="_onDelete" data-tag$="[[tag]]"></iron-icon>
                             </div>
                         </template>
                     </div>
-                </template>
-                <template if="{{selected.length == 0}}">
-                    <span class="placeholder">{{label}}</span>
-                </template>
+                </div>
+                <div>
+                    <iron-icon tabindex="0" class="select" icon="fa:caret-down" ></iron-icon>
+                </div>
             </div>
-            <div>
-                <core-icon tabindex="0" class="select" icon="fa:caret-down" ></core-icon>
-            </div>
-        </div>
-        <div relative>
-            <cg-dropdown id="dd" class="dropdown" on-core-select="{{_onAdd}}" layered>
-                <paper-input autofocus tabindex="0" id="search" label="Search or new" role="header" on-keyup="{{_search}}" on-keypress="{{_selectOrNew}}"></paper-input>
-                <core-menu class="menu" id="menu">
-                    <template repeat="{{_tagsView as tag}}">
-                        <paper-item class="tag-item" on-focus="{{_preselectItem}}" on-blur="{{_deselectItem}}" tabindex="0" data-tag="{{tag}}">{{tag}}</paper-item>
+            <cg-dropdown id="dd" class="dropdown" owner-target="[[self]]">
+                <paper-input dd-header autofocus tabindex="0" id="search" label="Search or new"  on-keyup="_search" on-keypress="_selectOrNew"></paper-input>
+                <paper-menu dd-content class="menu" id="menu">
+                    <template is="dom-repeat" items="[[_tagsView]]" as="tag">
+                        <paper-item class="tag-item" on-focus="_preselectItem" on-blur="_deselectItem" tabindex="0" data-tag$="[[tag]]">[[tag]]</paper-item>
                     </template>
-                </core-menu>
+                </paper-menu>
             </cg-dropdown>
+            <!--<core-a11y-keys id="ally" target="{{$.tags}}" keys="del" on-keys-pressed="{{_handleTagKey}}"></core-a11y-keys>-->
+            <!--<core-a11y-keys id="ally1" target="{{$.tagInput}}" keys="down enter" on-keys-pressed="{{_handleDDKey}}"></core-a11y-keys>-->
+            <!--<core-a11y-keys id="ally2" target="{{$.menu}}" keys="enter" on-keys-pressed="{{_handleDDListKey}}"></core-a11y-keys>-->
         </div>
-        <core-a11y-keys id="ally" target="{{$.tags}}" keys="del" on-keys-pressed="{{_handleTagKey}}"></core-a11y-keys>
-        <core-a11y-keys id="ally1" target="{{$.tagInput}}" keys="down enter" on-keys-pressed="{{_handleDDKey}}"></core-a11y-keys>
-        <core-a11y-keys id="ally2" target="{{$.menu}}" keys="enter" on-keys-pressed="{{_handleDDListKey}}"></core-a11y-keys>
     </template>
     <script>
-        Polymer("cg-input-tags", {
-            label:null,
-            required:false,
-            tags:null,
-            selected:null,
-            _tags:null,
-            _tagsView:null,
-            _decoratorElement:null,
-            created:function(){
-                this.super();
-                // if set in json object, array is shared across instances!
-                this.selected= [];
-                this._tags = [];
-                this._tagsView = [];
-            },
-            domReady:function(){
-                this.super();
-                if(this.parentElement.tagName.toLowerCase() == "paper-input-decorator") {
-                    this._decoratorElement = this.parentElement; // _decoratorElement thing's quite nasty..
-                    this._decoratorElement.input = this.$.input; // _decoratorElement thing's quite nasty..
-                    this.label = this._decoratorElement.getAttribute("label");
+        Polymer({
+            is:"cg-input-tags",
+            properties:{
+                listensTo:{
+                    value:[]
+                },
+                cgName:{
+                    type:String,
+                    value:"tags"
+                },
+                label:String,
+                tags:{
+                    type:Array,
+                    observer:'tagsChanged'
+                },
+                selected:{
+                    type:Array,
+                    value:[],
+                    notify:true,
+                    observer:'selectedChanged'
+                },
+                required:{
+                    type:Boolean,
+                    value:false
+                },
+                _tags:{
+                    type:Array,
+                    value:[],
+                    observer:'_tagsChanged'
+                },
+                _tagsView:{
+                    type:Array,
+                    value:[]
+                },
+                validator:{
+                    type: String,
+                    value: 'cg-required-validator'
                 }
+            },
+            behaviors:[CG.BaseBehavior, CG.ValidatableBehavior],
+            listeners:{
+                'iron-activate':'_onAdd'
+            },
+            observers:[
+                '_tagsChanged(_tags.*)',
+                'selectedChanged(selected.*)',
+                'tagsChanged(tags.*)',
+            ],
+            ready:function(){
                 if(this.isDataAware() && this.tags == null) {
                     console.log("[cg-input-tags] no tags provided firing data request");
                     this.fireDataRequest({
@@ -124,6 +182,9 @@
                     console.log("[cg-input-tags] tags provided, using them");
                 }
             },
+            hasSelected:function(selected){
+                return selected && selected.length > 0;
+            },
             tagsChanged:function(){
                 this._tags = this.tags.slice();
             },
@@ -137,11 +198,9 @@
                 for(var i = 0; i < this.selected.length; i++){
                     var tag = this.selected[i];
                     var index = this._tags.indexOf(tag);
-                    index != -1 && this._tags.splice(index, 1);
+                    index != -1 && this.splice("_tags", index, 1);
                 }
-                this.$.input.value = this.selected.toString();
-                this._decoratorElement && this._decoratorElement.inputChanged();
-               // this.fire("change", this.selected); TODO WHY ? UNCOMMENTED FOR SOME REASON cg-event-editor dialog opens and closes up immediately
+                this.fire("change", this.selected);
             },
             _onUnselectTag:function(e){
                 this._unselectTag(e.currentTarget);
@@ -149,7 +208,7 @@
             },
             _unselectTag:function(e){
                 e.classList.remove("selected");
-                e.querySelector("paper-shadow").setZ(1);
+                e.querySelector("paper-material").elevation = 1;
             },
             _onSelectTag:function(e){
                 var selected = this.querySelector(".tag.selected");
@@ -159,11 +218,11 @@
             },
             _selectTag:function(e){
                 e.classList.add("selected");
-                e.querySelector("paper-shadow").setZ(2);
+                e.querySelector("paper-material").elevation = 2;
                 e.focus();
             },
             _tagsChanged:function(){
-                this._tagsView = this._tags.slice();
+                this.set("_tagsView", this._tags.slice());
             },
             _select:function(e){
                 this.$.dd.toggle();
@@ -175,9 +234,9 @@
             _delete:function(e){
                 for(var i = 0; i < this.selected.length; i++) {
                     if(this.selected[i] == e.dataset.tag) {
-                        var o = this.selected.splice(i, 1)[0];
+                        var o = this.splice("selected", i, 1)[0];
                         if (this.tags.indexOf(o) != -1) {
-                            this._tags.splice(0, 0, o);
+                            this.splice("_tags", 0, 0, o);
                         }
                         break;
                     }
@@ -190,8 +249,7 @@
                 if(this.selected.indexOf(tag) != -1) {
                     return;
                 }
-                this.selected.push(tag);
-                this._decoratorElement && this._decoratorElement.inputChanged();
+                this.push("selected", tag);
                 this.$.menu.selected = null;
             },
             _selectOrNew:function(e){
@@ -207,7 +265,7 @@
                             return;
                         }
                     }
-                    this.selected.push(tag);
+                    this.push("selected", tag);
                 }
             },
             _search:function(e){
@@ -294,4 +352,4 @@
             }
         });
     </script>
-</polymer-element>
+</dom-module>

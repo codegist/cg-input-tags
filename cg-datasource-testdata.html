@@ -1,23 +1,30 @@
 <link href="../polymer/polymer.html" rel="import">
+<link href="../cg-datasource/cg-datasource-base-behavior.html" rel="import">
 <link href="../cg-base/cg-base-behavior.html" rel="import">
 
-<dom-module id="odous-datasource-testdata">
+<dom-module id="cg-datasource-testdata">
 </dom-module>
 <script>
     Polymer({
-        is:'odous-datasource-testdata',
+        is:'cg-datasource-testdata',
         properties:{
             providersMap:{
-                type:Object,
-                value:{
-                    'demo-tag-list':this.getTags,
+                type:Function,
+                value:function(){
+                    return {
+                        'tags/data':this.getTags
+                    };
                 }
             }
         },
         behaviors:[CG.DataSourceBaseBehavior],
+        ready:function(){
+            this.globals.dataAware = true;
+        },
         getTags:function(options){
-            console.log("### Datasource[TestData] getColors(params:"+JSON.stringify(options)+")");
+            console.log("### Datasource[TestData] getTags(params:"+JSON.stringify(options.params)+")");
             return options.success({success:true,data:["hello","there","1","banana","hey there"]});
         }
     });
 </script>
+
