@@ -1,8 +1,9 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
-<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../cg-base/cg-required-validator.html">
+<link rel="import" href="../cg-base/cg-validatable-behavior.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
@@ -12,8 +13,6 @@
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
 <link rel="import" href="../cg-dropdown/cg-dropdown.html">
 <link rel="import" href="../cg-base/cg-base-behavior.html">
-<link rel="import" href="../cg-base/cg-required-validator.html">
-<link rel="import" href="../cg-base/cg-validatable-behavior.html">
 
 <dom-module id="cg-input-tags">
     <style>
@@ -108,7 +107,7 @@
                     <iron-icon tabindex="0" class="select" icon="fa:caret-down" ></iron-icon>
                 </div>
             </div>
-            <cg-dropdown id="dd" class="dropdown" owner-target="[[self]]">
+            <cg-dropdown id="dd" class="dropdown">
                 <paper-input dd-header autofocus tabindex="0" id="search" label="Search or new"  on-keyup="_search" on-keypress="_selectOrNew"></paper-input>
                 <paper-menu dd-content class="menu" id="menu">
                     <template is="dom-repeat" items="[[_tagsView]]" as="tag">
