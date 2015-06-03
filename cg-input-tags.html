@@ -107,7 +107,7 @@
                     <iron-icon tabindex="0" class="select" icon="fa:caret-down" ></iron-icon>
                 </div>
             </div>
-            <cg-dropdown id="dd" class="dropdown">
+            <cg-dropdown id="dd" class="dropdown" owner-target="[[self]]">
                 <paper-input dd-header autofocus tabindex="0" id="search" label="Search or new"  on-keyup="_search" on-keypress="_selectOrNew"></paper-input>
                 <paper-menu dd-content class="menu" id="menu">
                     <template is="dom-repeat" items="[[_tagsView]]" as="tag">
