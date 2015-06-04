@@ -89,7 +89,7 @@
             <cg-required-validator required="[[required]]"></cg-required-validator>
             <div on-tap="_select" class="tag-input" id="tagInput" tabindex="0" >
                 <div class="tags-wrapper">
-                    <span class="placeholder" hidden$="[[hasSelected(selected, selected.length)]]">[[label]]</span>
+                    <span class="placeholder" hidden$="[[hasLength(selected.length)]]">[[label]]</span>
                     <div id="tags" class="tags">
                         <template is="dom-repeat" items="[[selected]]" as="tag" >
                             <div tabindex="0" class="tag"
@@ -162,7 +162,8 @@
             },
             behaviors:[CG.BaseBehavior, CG.ValidatableBehavior],
             listeners:{
-                'iron-activate':'_onAdd'
+                'iron-activate':'_onAdd',
+                'click':'cancelEvent'
             },
             observers:[
                 '_tagsChanged(_tags.*)',
@@ -183,9 +184,6 @@
                 }else{
                     console.log("[cg-input-tags] tags provided, using them");
                 }
-            },
-            hasSelected:function(selected){
-                return selected && selected.length > 0;
             },
             tagsChanged:function(){
                 this._tags = this.tags.slice();
@@ -230,8 +228,8 @@
                 this.$.dd.toggle();
             },
             _onDelete:function(e){
+                this.cancelEvent(e);
                 this._delete(e.currentTarget);
-                e.stopPropagation();
             },
             _delete:function(e){
                 for(var i = 0; i < this.selected.length; i++) {
