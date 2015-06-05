@@ -166,9 +166,9 @@
                 'click':'cancelEvent'
             },
             observers:[
-                '_tagsChanged(_tags.*)',
-                'selectedChanged(selected.*)',
-                'tagsChanged(tags.*)',
+                '_tagsChanged(_tags.splices)',
+                'selectedChanged(selected.splices)',
+                'tagsChanged(tags.splices)',
             ],
             ready:function(){
                 if(this.isDataAware() && this.tags == null) {
@@ -200,7 +200,7 @@
                     var index = this._tags.indexOf(tag);
                     index != -1 && this.splice("_tags", index, 1);
                 }
-                this.fire("change", this.selected);
+                this.fire("input", this.selected);
             },
             _onUnselectTag:function(e){
                 this._unselectTag(e.currentTarget);
