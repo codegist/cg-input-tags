@@ -89,7 +89,7 @@
             <cg-required-validator required="[[required]]"></cg-required-validator>
             <div on-tap="_select" class="tag-input" id="tagInput" tabindex="0" >
                 <div class="tags-wrapper">
-                    <span class="placeholder" hidden$="[[hasLength(selected.length)]]">[[label]]</span>
+                    <span class="placeholder" hidden$="[[isGreaterThan(selected.length, 0)]]">[[label]]</span>
                     <div id="tags" class="tags">
                         <template is="dom-repeat" items="[[selected]]" as="tag" >
                             <div tabindex="0" class="tag"
@@ -166,9 +166,9 @@
                 'click':'cancelEvent'
             },
             observers:[
-                '_tagsChanged(_tags.splices)',
-                'selectedChanged(selected.splices)',
-                'tagsChanged(tags.splices)',
+                '_tagsChanged(_tags.*)',
+                'selectedChanged(selected.splice)',
+                'tagsChanged(tags.*)',
             ],
             ready:function(){
                 if(this.isDataAware() && this.tags == null) {
