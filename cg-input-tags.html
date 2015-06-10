@@ -166,9 +166,9 @@
                 'click':'cancelEvent'
             },
             observers:[
-                '_tagsChanged(_tags.*)',
+                '_tagsChanged(_tags.splices)',
                 'selectedChanged(selected.splices)',
-                'tagsChanged(tags.*)',
+                'tagsChanged(tags.splices)',
             ],
             ready:function(){
                 if(this.isDataAware() && this.tags == null) {
@@ -191,9 +191,6 @@
             selectedChanged:function(){
                 if(!this.tags || !this.selected) {
                     return;
-                }
-                if(this.selected.length + this._tags.length != this.tags.length) {
-                    this.tagsChanged();
                 }
                 for(var i = 0; i < this.selected.length; i++){
                     var tag = this.selected[i];
