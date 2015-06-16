@@ -12,7 +12,8 @@
 <link rel="import" href="../iron-a11y-keys/iron-a11y-keys.html">
 <link rel="import" href="../font-awesome-polymer-icons/fa-icons.html">
 <link rel="import" href="../cg-dropdown/cg-dropdown.html">
-<link rel="import" href="../cg-base/cg-base-behavior.html">
+<link rel="import" href="../cg-behaviors/cg-base-behavior.html">
+<link rel="import" href="../cg-behaviors/cg-application-datasource-aware-behavior.html">
 
 <dom-module id="cg-input-tags">
     <style>
@@ -58,7 +59,7 @@
             background-color:#dddddd;
         }
 
-        .wrapper cg-dropdown ::content #dd-menu {
+        .wrapper cg-dropdown ::content #dd_content {
             max-height:200px;
             overflow:auto;
             margin:5px;
@@ -124,9 +125,6 @@
         Polymer({
             is:"cg-input-tags",
             properties:{
-                listensTo:{
-                    value:[]
-                },
                 cgName:{
                     type:String,
                     value:"tags"
@@ -140,7 +138,7 @@
                     type:Array,
                     value:[],
                     notify:true,
-                    observer:'selectedChanged'
+//                    observer:'selectedChanged'
                 },
                 required:{
                     type:Boolean,
@@ -160,7 +158,7 @@
                     value: 'cg-required-validator'
                 }
             },
-            behaviors:[CG.BaseBehavior, CG.ValidatableBehavior],
+            behaviors:[CG.BaseBehavior, CG.ApplicationDataSourceAwareBehavior,CG.ValidatableBehavior],
             listeners:{
                 'iron-activate':'_onAdd',
                 'click':'cancelEvent'
@@ -171,8 +169,8 @@
                 'tagsChanged(tags.splices)',
             ],
             ready:function(){
-                if(this.isDataAware() && this.tags == null) {
-                    console.log("[cg-input-tags] no tags provided firing data request");
+                if(this.tags == null) {
+                    console.log(this.toString(), "no tags provided firing data request");
                     this.fireDataRequest({
                         type:'data',
                         success:function(response){
@@ -182,13 +180,13 @@
                         failure:function(response){}.bind(this)
                     });
                 }else{
-                    console.log("[cg-input-tags] tags provided, using them");
+                    console.log(this.toString(), "tags provided, using them");
                 }
             },
             tagsChanged:function(){
                 this._tags = this.tags.slice();
             },
-            selectedChanged:function(){
+            selectedChanged:function(changes){
                 if(!this.tags || !this.selected) {
                     return;
                 }
@@ -197,7 +195,7 @@
                     var index = this._tags.indexOf(tag);
                     index != -1 && this.splice("_tags", index, 1);
                 }
-                this.fire("input", this.selected);
+                changes && this.fire("input", this.selected);
             },
             _onUnselectTag:function(e){
                 this._unselectTag(e.currentTarget);

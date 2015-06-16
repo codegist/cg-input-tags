@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../cg-datasource/cg-datasource-base-behavior.html">
-<link rel="import" href="../cg-base/cg-base-behavior.html">
 
 <dom-module id="cg-datasource-testdata">
 </dom-module>
@@ -18,9 +17,6 @@
             }
         },
         behaviors:[CG.DataSourceBaseBehavior],
-        ready:function(){
-            this.globals.dataAware = true;
-        },
         getTags:function(options){
             console.log("### Datasource[TestData] getTags(params:"+JSON.stringify(options.params)+")");
             return options.success({success:true,data:["hello","there","1","banana","hey there"]});
