@@ -275,7 +275,7 @@
                             lowRelevance.push(e);
                         }
                     }
-                }.bind(this));
+                }, this);
                 var results = highRelevance.concat(lowRelevance);
                 this._tagsView = results;
             },
