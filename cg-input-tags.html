@@ -161,7 +161,6 @@
             behaviors:[CG.BaseBehavior, CG.ApplicationDataSourceAwareBehavior,CG.ValidatableBehavior],
             listeners:{
                 'iron-activate':'_onAdd',
-                'click':'cancelEvent'
             },
             observers:[
                 '_tagsChanged(_tags.splices)',
@@ -223,7 +222,6 @@
                 this.$.dd.toggle();
             },
             _onDelete:function(e){
-                this.cancelEvent(e);
                 this._delete(e.currentTarget);
             },
             _delete:function(e){
